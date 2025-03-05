@@ -5,6 +5,7 @@ import {
   deleteContact,
   createContact,
   updateContact,
+  updateStatusContact,
 } from "../controllers/contactsControllers.js";
 
 import controllerWrapper from "../decorators/controllerWrapper.js";
@@ -23,5 +24,7 @@ contactsRouter.delete("/:id", controllerWrapper(deleteContact));
 contactsRouter.post("/", validateBody(createContactSchema), controllerWrapper(createContact));
 
 contactsRouter.put("/:id", validateBody(updateContactSchema), controllerWrapper(updateContact));
+
+contactsRouter.patch("/:id/favorite", validateBody(updateContactSchema), controllerWrapper(updateStatusContact));
 
 export default contactsRouter;
