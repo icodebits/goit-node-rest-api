@@ -56,3 +56,16 @@ export const loginUser = async (req, res) => {
       },
     });
 };
+
+export const logoutUser = async (req, res) => {
+  const { id } = req.user;
+
+  const user = await authService.getUserById(id);
+
+  if (!user) {
+      throw HttpError(401, "Not authorized");
+  }
+
+  await authService.updateUserToken(id, null);
+  res.status(204).json();
+};
