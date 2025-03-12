@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../db/models/User.js";
 import authService from "../services/authServices.js";
 import HttpError from "../helpers/HttpError.js";
+import gravatar from "gravatar";
 
 export const registerNewUser = async (req, res) => {
     const { email, password } = req.body;
@@ -14,13 +15,15 @@ export const registerNewUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const avatarURL = await gravatar.url(email, { s: "250", d: "retro" }, true);
 
-    const newUser = await authService.registerUser(email, hashedPassword);
+    const newUser = await authService.registerUser(email, hashedPassword, avatarURL);
 
     res.status(201).json({
       user: {
         email: newUser.email,
         subscription: newUser.subscription,
+        avatarURL: newUser.avatarURL,
       },
     });
 };
