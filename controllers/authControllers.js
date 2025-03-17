@@ -3,6 +3,11 @@ import jwt from "jsonwebtoken";
 import User from "../db/models/User.js";
 import authService from "../services/authServices.js";
 import HttpError from "../helpers/HttpError.js";
+import gravatar from "gravatar";
+import path from "node:path";
+import fs from "node:fs/promises";
+
+const avatarsDir = path.resolve("public/avatars");
 
 export const registerNewUser = async (req, res) => {
     const { email, password } = req.body;
@@ -14,13 +19,15 @@ export const registerNewUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const avatarURL = await gravatar.url(email, { s: "250", d: "retro" }, true);
 
-    const newUser = await authService.registerUser(email, hashedPassword);
+    const newUser = await authService.registerUser(email, hashedPassword, avatarURL);
 
     res.status(201).json({
       user: {
         email: newUser.email,
         subscription: newUser.subscription,
+        avatarURL: newUser.avatarURL,
       },
     });
 };
@@ -83,3 +90,20 @@ export const getCurrentUser = async (req, res) => {
     subscription: user.subscription
   })
 };
+
+export const updateAvatar = async (req, res) => {
+  if (!req.file) {
+    throw HttpError(400, "No file uploaded");
+  }
+
+  const { path: tempPath, filename } = req.file;
+  const newAvatarName = `${req.user.id}-${Date.now()}${path.extname(filename)}`;
+  const newAvatarPath = path.join(avatarsDir, newAvatarName);
+
+  await fs.rename(tempPath, newAvatarPath);
+
+  const avatarURL = `/avatars/${newAvatarName}`;
+  await authService.updateUserAvatar(req.user.id, avatarURL);
+
+  res.json({ avatarURL });
+}

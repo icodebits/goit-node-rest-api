@@ -1,7 +1,7 @@
 import User from "../db/models/User.js";
 
-async function registerUser(email, password) {
-    const user = await User.create({ email, password });
+async function registerUser(email, password, avatarURL) {
+    const user = await User.create({ email, password, avatarURL });
     return user;
 }
 
@@ -17,4 +17,8 @@ async function updateUserToken(userId, token) {
     return await User.update({ token }, { where: { id: userId } });
 }
 
-export default { registerUser, getUser, getUserById, updateUserToken };
+async function updateUserAvatar(userId, avatarURL) {
+    return await User.update({ avatarURL }, { where: { id: userId } });
+}
+
+export default { registerUser, getUser, getUserById, updateUserToken, updateUserAvatar };
