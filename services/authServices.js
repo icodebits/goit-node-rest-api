@@ -1,7 +1,7 @@
 import User from "../db/models/User.js";
 
-async function registerUser(email, password, avatarURL) {
-    const user = await User.create({ email, password, avatarURL });
+async function registerUser(email, password, avatarURL, verificationToken) {
+    const user = await User.create({ email, password, avatarURL, verificationToken });
     return user;
 }
 
